@@ -53,15 +53,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                showPricePurchasedDialog(MainActivity.this);
-
+                showPricePurchasedDialog(MainActivity.this, position);
             }
 
         });
+
         groceryList = FirebaseDatabase.getInstance().getReference().child("Grocery List");
         groceryList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                groceryList = FirebaseDatabase.getInstance().getReference().child("Grocery List");
+                arrayList.clear();
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     String item = postSnapshot.getKey().toString();
                     arrayList.add(item);
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showAddItemDialog(Context c) {
+        groceryList = FirebaseDatabase.getInstance().getReference();
         final EditText taskEditText = new EditText(c);
         AlertDialog dialog = new AlertDialog.Builder(c)
                 .setTitle("Add a new item")
@@ -96,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void showPricePurchasedDialog(Context c) {
+    private void showPricePurchasedDialog(Context c, final int position) {
         final EditText taskEditText = new EditText(c);
         AlertDialog dialog = new AlertDialog.Builder(c)
                 .setTitle("Please enter the price of the item")
@@ -105,8 +108,10 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
-
+                        String item = arrayList.get(position);
+                        String price = String.valueOf(taskEditText.getText());
+                        groceryList.child(item).child("Is purchased").setValue("yes");
+                        groceryList.child(item).child("Price").setValue(price);
                     }
                 })
                 .setNegativeButton("Cancel", null)
