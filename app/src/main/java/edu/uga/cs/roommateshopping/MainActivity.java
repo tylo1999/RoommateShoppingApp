@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -40,11 +41,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
         list = (ListView) findViewById(R.id.itemList);
         arrayList = new ArrayList<String>();
         adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, arrayList);
         list.setAdapter(adapter);
 
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                showPricePurchasedDialog(MainActivity.this);
+
+            }
+
+        });
         groceryList = FirebaseDatabase.getInstance().getReference().child("Grocery List");
         groceryList.addValueEventListener(new ValueEventListener() {
             @Override
@@ -75,6 +88,24 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String item = String.valueOf(taskEditText.getText());
                         groceryList.child("Grocery List").child(item).child("Is purchased").setValue("no");
+
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
+    }
+
+    private void showPricePurchasedDialog(Context c) {
+        final EditText taskEditText = new EditText(c);
+        AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle("Please enter the price of the item")
+                .setMessage("Note: Pressing okay indicates that this item has been purchased")
+                .setView(taskEditText)
+                .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
 
                     }
                 })
