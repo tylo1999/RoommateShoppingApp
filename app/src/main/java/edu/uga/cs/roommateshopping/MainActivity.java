@@ -45,12 +45,12 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, arrayList);
         list.setAdapter(adapter);
 
-        groceryList = FirebaseDatabase.getInstance().getReference();
+        groceryList = FirebaseDatabase.getInstance().getReference().child("Grocery List");
         groceryList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    String item = postSnapshot.toString();
+                    String item = postSnapshot.getKey().toString();
                     arrayList.add(item);
                     adapter.notifyDataSetChanged();
                 }
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String item = String.valueOf(taskEditText.getText());
-                        groceryList.child("Grocery List").push().child("Item name").setValue(item);
+                        groceryList.child("Grocery List").child(item).child("Is purchased").setValue("no");
 
                     }
                 })
