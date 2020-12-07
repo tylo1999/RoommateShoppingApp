@@ -1,17 +1,16 @@
 package edu.uga.cs.roommateshopping;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -65,9 +64,12 @@ public class MainActivity extends AppCompatActivity {
                 groceryList = FirebaseDatabase.getInstance().getReference().child("Grocery List");
                 arrayList.clear();
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    String item = postSnapshot.getKey().toString();
-                    arrayList.add(item);
-                    adapter.notifyDataSetChanged();
+
+                    String item = postSnapshot.getKey();
+                    if(postSnapshot.child("Is purchased").getValue().toString().equals("no")) {
+                        arrayList.add(item);
+                        adapter.notifyDataSetChanged();
+                    }
                 }
             }
 
@@ -100,16 +102,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showPricePurchasedDialog(Context c, final int position) {
-        final EditText taskEditText = new EditText(c);
+        final EditText priceEditText = new EditText(c);
+        priceEditText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         AlertDialog dialog = new AlertDialog.Builder(c)
                 .setTitle("Please enter the price of the item")
                 .setMessage("Note: Pressing okay indicates that this item has been purchased")
-                .setView(taskEditText)
+                .setView(priceEditText)
                 .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String item = arrayList.get(position);
-                        String price = String.valueOf(taskEditText.getText());
+                        Double price =  Double.parseDouble(String.valueOf(priceEditText.getText()));
                         groceryList.child(item).child("Is purchased").setValue("yes");
                         groceryList.child(item).child("Price").setValue(price);
                     }
