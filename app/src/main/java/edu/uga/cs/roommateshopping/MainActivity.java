@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
                         Double price =  Double.parseDouble(String.valueOf(priceEditText.getText()));
                         groceryList.child(item).child("Is purchased").setValue("yes");
                         groceryList.child(item).child("Price").setValue(price);
+
                         showAddName(c,item);
                     }
                 })
@@ -142,14 +143,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void showAddName(final Context c, final String item){
         groceryList = FirebaseDatabase.getInstance().getReference();
-        final EditText taskEditText = new EditText(c);
+        final EditText nameEditText = new EditText(c);
         AlertDialog dialog = new AlertDialog.Builder(c)
-                .setTitle("Enter a roommate's name")
-                .setView(taskEditText)
+                .setTitle("Please enter name of purchaser")
+                .setView(nameEditText)
                 .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String item2 = String.valueOf(taskEditText.getText());
+                        String item2 = String.valueOf(nameEditText.getText());
                         groceryList.child(item).child("Name").setValue(item2);
                     }
                 })

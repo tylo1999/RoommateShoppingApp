@@ -63,7 +63,7 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
                         String name = postSnapshot.child("Name").getValue().toString();
                         String price = postSnapshot.child("Price").getValue().toString();
                         totalCost = totalCost + Double.parseDouble(price);
-                        String info = "     Name: " + name + "     Item: "  + item + "     Price: " + price;
+                        String info = "     Name: " + name + "     Item: "  + item + "     Price: $" + price;
                         arrayList.add(info);
                         adapter.notifyDataSetChanged();
                     }
