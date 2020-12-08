@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class RecentlyPurchasedActivity extends AppCompatActivity {
@@ -27,8 +28,10 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private ArrayList<String> arrayList;
     private Button calculate;
-    private int totalCost;
     private TextView numOfRoommates;
+    private TextView splitCost;
+    private double totalCost;
+    private double number;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +39,8 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recently_purchased);
 
         calculate = (Button) findViewById( R.id.button3 );
+        numOfRoommates = (TextView) findViewById( R.id.numOfRoommates);
+        splitCost = (TextView) findViewById( R.id.textView7);
 
         list = (ListView) findViewById(R.id.itemList1);
         arrayList = new ArrayList<String>();
@@ -55,9 +60,9 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
                     String item = postSnapshot.getKey();
 
                     if(postSnapshot.child("Is purchased").getValue().toString().equals("yes")) {
-                        //totalCost = postSnapshot.child("Price").getValue();
                         String name = postSnapshot.child("Name").getValue().toString();
                         String price = postSnapshot.child("Price").getValue().toString();
+                        totalCost = totalCost + Double.parseDouble(price);
                         String info = "     Name: " + name + "     Item: "  + item + "     Price: " + price;
                         arrayList.add(info);
                         adapter.notifyDataSetChanged();
@@ -78,7 +83,11 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-
+                DecimalFormat twoDecimal = new DecimalFormat("#.##"); // format class
+                number = Double.parseDouble(numOfRoommates.getText().toString()); // change number of roommates to double
+                double split = totalCost/number; // Do math
+                String display = twoDecimal.format(split); // round
+                splitCost.setText(display); // display the amount.
             }
         });
 
