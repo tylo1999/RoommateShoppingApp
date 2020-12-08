@@ -27,6 +27,7 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
     private ListView list;
     private ArrayAdapter<String> adapter;
     private ArrayList<String> arrayList;
+    private ArrayList<String> itemList;
     private Button calculate;
     private TextView numOfRoommates;
     private TextView splitCost;
@@ -44,6 +45,7 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
 
         list = (ListView) findViewById(R.id.itemList1);
         arrayList = new ArrayList<String>();
+        itemList = new ArrayList<String>();
         adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, arrayList);
         list.setAdapter(adapter);
 
@@ -58,13 +60,15 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
 
                     String item = postSnapshot.getKey();
-
-                    if(postSnapshot.child("Is purchased").getValue().toString().equals("yes")) {
-                        String name = postSnapshot.child("Name").getValue().toString();
-                        String price = postSnapshot.child("Price").getValue().toString();
+                    String name = "      ";
+                    String price = "     ";
+                    if(postSnapshot.child("Is purchased").getValue().toString().equals("yes") && postSnapshot.child("Price").getValue() != null && postSnapshot.child("Name").getValue() != null) {
+                        name = postSnapshot.child("Name").getValue().toString();
+                        price = postSnapshot.child("Price").getValue().toString();
                         totalCost = totalCost + Double.parseDouble(price);
                         String info = "     Name: " + name + "     Item: "  + item + "     Price: $" + price;
                         arrayList.add(info);
+                        itemList.add(item);
                         adapter.notifyDataSetChanged();
                     }
                 }
@@ -90,11 +94,16 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                groceryList = FirebaseDatabase.getInstance().getReference().child("Grocery List");
                 DecimalFormat twoDecimal = new DecimalFormat("#.##"); // format class
                 number = Double.parseDouble(numOfRoommates.getText().toString()); // change number of roommates to double
                 double split = totalCost/number; // Do math
                 String display = twoDecimal.format(split); // round
                 splitCost.setText(display); // display the amount.
+                for(int i=0; i<arrayList.size(); i++) {
+                    String item = itemList.get(i);
+                    groceryList.child(item).child("Is purchased").setValue("Settled");
+                }
                 arrayList.clear();
                 adapter.notifyDataSetChanged();
             }

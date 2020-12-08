@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String item = arrayList.get(position);
                         Double price =  Double.parseDouble(String.valueOf(priceEditText.getText()));
-                        groceryList.child(item).child("Is purchased").setValue("yes");
+
                         groceryList.child(item).child("Price").setValue(price);
 
                         showAddName(c,item);
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showAddName(final Context c, final String item){
-        groceryList = FirebaseDatabase.getInstance().getReference();
+        groceryList = FirebaseDatabase.getInstance().getReference().child("Grocery List");
         final EditText nameEditText = new EditText(c);
         AlertDialog dialog = new AlertDialog.Builder(c)
                 .setTitle("Please enter name of purchaser")
@@ -177,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String item2 = String.valueOf(nameEditText.getText());
                         groceryList.child(item).child("Name").setValue(item2);
+                        groceryList.child(item).child("Is purchased").setValue("yes");
                     }
                 })
                 .setNegativeButton("Cancel", null)
