@@ -73,7 +73,7 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
                     arrayList.add(empty);
                     adapter.notifyDataSetChanged();
                 }
-                
+
             }
 
             @Override
@@ -95,6 +95,8 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
                 double split = totalCost/number; // Do math
                 String display = twoDecimal.format(split); // round
                 splitCost.setText(display); // display the amount.
+                arrayList.clear();
+                adapter.notifyDataSetChanged();
             }
         });
 
