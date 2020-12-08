@@ -22,6 +22,10 @@
             </intent-filter>
 
         </activity>
+
+        <activity android:name=".RecentlyPurchasedActivity" android:parentActivityName=".MainActivity">
+
+        </activity>
     </application>
 
 </manifest>

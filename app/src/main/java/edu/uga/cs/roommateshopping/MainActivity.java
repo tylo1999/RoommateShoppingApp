@@ -4,11 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private ListView list;
     private ArrayAdapter<String> adapter;
     private ArrayList<String> arrayList;
+    private Button Button1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        Button1 = (Button) findViewById( R.id.button1 );
 
         list = (ListView) findViewById(R.id.itemList);
         arrayList = new ArrayList<String>();
@@ -80,6 +84,18 @@ public class MainActivity extends AppCompatActivity {
                 // ...
             }
         });
+
+
+        // Listener for recently purchased list
+        Button1.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), RecentlyPurchasedActivity.class);
+                startActivity(intent);
+
+            }
+        });
     }
 
     private void showAddItemDialog(Context c) {
@@ -101,20 +117,40 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void showPricePurchasedDialog(Context c, final int position) {
+
+    private void showPricePurchasedDialog(final Context c, final int position) {
         final EditText priceEditText = new EditText(c);
         priceEditText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         AlertDialog dialog = new AlertDialog.Builder(c)
                 .setTitle("Please enter the price of the item")
                 .setMessage("Note: Pressing okay indicates that this item has been purchased")
                 .setView(priceEditText)
-                .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Next", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String item = arrayList.get(position);
                         Double price =  Double.parseDouble(String.valueOf(priceEditText.getText()));
                         groceryList.child(item).child("Is purchased").setValue("yes");
                         groceryList.child(item).child("Price").setValue(price);
+                        showAddName(c,item);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
+    }
+
+    private void showAddName(final Context c, final String item){
+        groceryList = FirebaseDatabase.getInstance().getReference();
+        final EditText taskEditText = new EditText(c);
+        AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle("Enter a roommate's name")
+                .setView(taskEditText)
+                .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String item2 = String.valueOf(taskEditText.getText());
+                        groceryList.child(item).child("Name").setValue(item2);
                     }
                 })
                 .setNegativeButton("Cancel", null)
