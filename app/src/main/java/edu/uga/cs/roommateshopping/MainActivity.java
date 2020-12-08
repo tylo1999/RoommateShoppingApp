@@ -13,6 +13,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private ArrayList<String> arrayList;
     private Button Button1;
+    private Button Button2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Button1 = (Button) findViewById( R.id.button1 );
+        Button2 = (Button) findViewById( R.id.button2 );
 
         list = (ListView) findViewById(R.id.itemList);
         arrayList = new ArrayList<String>();
@@ -75,7 +79,13 @@ public class MainActivity extends AppCompatActivity {
                         adapter.notifyDataSetChanged();
                     }
                 }
+                if(arrayList.isEmpty()){
+                    String empty = "                     List is empty, press + to add item";
+                    arrayList.add(empty);
+                    adapter.notifyDataSetChanged();
+                }
             }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -86,6 +96,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
+
+
+
         // Listener for recently purchased list
         Button1.setOnClickListener(new View.OnClickListener() {
 
@@ -94,6 +108,17 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(v.getContext(), RecentlyPurchasedActivity.class);
                 startActivity(intent);
 
+            }
+        });
+
+        // Listener for recently purchased list
+        Button2.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), LoginActivity.class);
+                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "You have successfully signed-out", Toast.LENGTH_SHORT).show();
             }
         });
     }
