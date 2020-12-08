@@ -68,6 +68,12 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
                         adapter.notifyDataSetChanged();
                     }
                 }
+                if(arrayList.isEmpty()){
+                    String empty = "                     Nothing was recently purchased";
+                    arrayList.add(empty);
+                    adapter.notifyDataSetChanged();
+                }
+
             }
 
             @Override
@@ -77,6 +83,7 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
                 // ...
             }
         });
+
 
         // Listener for recently purchased list
         calculate.setOnClickListener(new View.OnClickListener() {
@@ -88,8 +95,11 @@ public class RecentlyPurchasedActivity extends AppCompatActivity {
                 double split = totalCost/number; // Do math
                 String display = twoDecimal.format(split); // round
                 splitCost.setText(display); // display the amount.
+                arrayList.clear();
+                adapter.notifyDataSetChanged();
             }
         });
+
 
     }
 
