@@ -26,6 +26,13 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+/**
+ * This class allows the user to add items to the list.
+ * Clicking the item provides a prompt that will
+ * let users input the name and price of the item that was
+ * just purchased.
+ *
+ */
 public class MainActivity extends AppCompatActivity {
     private DatabaseReference groceryList;
     private ListView list;
@@ -50,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         Button1 = (Button) findViewById( R.id.button1 );
         Button2 = (Button) findViewById( R.id.button2 );
 
-        list = (ListView) findViewById(R.id.itemList);
+        list = (ListView) findViewById(R.id.itemList); // creating a list to sow the grocery list
         arrayList = new ArrayList<String>();
         adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, arrayList);
         list.setAdapter(adapter);
@@ -68,13 +75,12 @@ public class MainActivity extends AppCompatActivity {
         groceryList = FirebaseDatabase.getInstance().getReference().child("Grocery List");
         groceryList.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot) { // This will read data live, and show what is suppose ot be shown
                 groceryList = FirebaseDatabase.getInstance().getReference().child("Grocery List");
-                arrayList.clear();
+                arrayList.clear(); // clear so it won't stack
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-
                     String item = postSnapshot.getKey();
-                    if(postSnapshot.child("Is purchased").getValue().toString().equals("no")) {
+                    if(postSnapshot.child("Is purchased").getValue().toString().equals("no")) { // adds to the list if not marked as purchased yet
                         arrayList.add(item);
                         adapter.notifyDataSetChanged();
                     }
@@ -96,12 +102,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
-
-
         // Listener for recently purchased list
-        Button1.setOnClickListener(new View.OnClickListener() {
+        Button1.setOnClickListener(new View.OnClickListener() { // button for to go to recently purchased
 
             @Override
             public void onClick(View v) {
@@ -112,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Listener for recently purchased list
-        Button2.setOnClickListener(new View.OnClickListener() {
+        Button2.setOnClickListener(new View.OnClickListener() { // button to sign out
 
             @Override
             public void onClick(View v) {
@@ -123,6 +125,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Dialog to add a new item into the data base.
+     * @param c gathers the context to save in database
+     */
     private void showAddItemDialog(Context c) {
         groceryList = FirebaseDatabase.getInstance().getReference();
         final EditText taskEditText = new EditText(c);
@@ -134,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String item = String.valueOf(taskEditText.getText());
                         groceryList.child("Grocery List").child(item).child("Is purchased").setValue("no");
-
                     }
                 })
                 .setNegativeButton("Cancel", null)
@@ -143,6 +148,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Allows user to input the price of the item that was purchased.
+     * The function will also place the item into recently purchased list.
+     */
     private void showPricePurchasedDialog(final Context c, final int position) {
         final EditText priceEditText = new EditText(c);
         priceEditText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
@@ -155,8 +164,9 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String item = arrayList.get(position);
                         Double price =  Double.parseDouble(String.valueOf(priceEditText.getText()));
-                        groceryList.child(item).child("Is purchased").setValue("yes");
+
                         groceryList.child(item).child("Price").setValue(price);
+
                         showAddName(c,item);
                     }
                 })
@@ -165,17 +175,23 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * Adds the name of the purchaser of the item to the database
+     * @param c gathers the context.
+     * @param item shows which item to add the context to.
+     */
     private void showAddName(final Context c, final String item){
-        groceryList = FirebaseDatabase.getInstance().getReference();
-        final EditText taskEditText = new EditText(c);
+        groceryList = FirebaseDatabase.getInstance().getReference().child("Grocery List");
+        final EditText nameEditText = new EditText(c);
         AlertDialog dialog = new AlertDialog.Builder(c)
-                .setTitle("Enter a roommate's name")
-                .setView(taskEditText)
-                .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                .setTitle("Please enter name of purchaser")
+                .setView(nameEditText)
+                .setPositiveButton("Submit", new DialogInterface.OnClickListener() { // submit button
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String item2 = String.valueOf(taskEditText.getText());
-                        groceryList.child(item).child("Name").setValue(item2);
+                        String item2 = String.valueOf(nameEditText.getText());
+                        groceryList.child(item).child("Name").setValue(item2); // adding name
+                        groceryList.child(item).child("Is purchased").setValue("yes"); // making it purchased
                     }
                 })
                 .setNegativeButton("Cancel", null)
